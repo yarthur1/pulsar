@@ -66,7 +66,7 @@ public class ThresholdShedder implements LoadSheddingStrategy {
             final LocalBrokerData localData = brokerData.getLocalData();
             final double currentUsage = brokerAvgResourceUsage.getOrDefault(broker, 0.0);
 
-            if (currentUsage < avgUsage + threshold) {
+            if (currentUsage < avgUsage + threshold) {     //超过阈值
                 if (log.isDebugEnabled()) {
                     log.debug("[{}] broker is not overloaded, ignoring at this point", broker);
                 }
@@ -77,7 +77,7 @@ public class ThresholdShedder implements LoadSheddingStrategy {
             double brokerCurrentThroughput = localData.getMsgThroughputIn() + localData.getMsgThroughputOut();
             double minimumThroughputToOffload = brokerCurrentThroughput * percentOfTrafficToOffload;
 
-            if (minimumThroughputToOffload < minThroughputThreshold) {
+            if (minimumThroughputToOffload < minThroughputThreshold) {          //unload的流量需要大于最小的吞吐阈值
                 if (log.isDebugEnabled()) {
                     log.info("[{}] broker is planning to shed throughput {} MByte/s less than " +
                                     "minimumThroughputThreshold {} MByte/s, skipping bundle unload.",
@@ -145,11 +145,11 @@ public class ThresholdShedder implements LoadSheddingStrategy {
         return totalBrokers > 0 ? totalUsage / totalBrokers : 0;
     }
 
-    private void updateAvgResourceUsage(String broker, LocalBrokerData localBrokerData, final double historyPercentage,
+    private void updateAvgResourceUsage(String broker, LocalBrokerData localBrokerData, final double historyPercentage,   //broker当前的资源使用情况计算
                                         final ServiceConfiguration conf) {
         double historyUsage = brokerAvgResourceUsage.getOrDefault(broker, 0.0);
         historyUsage = historyUsage * historyPercentage +
-                (1 - historyPercentage) * localBrokerData.getMaxResourceUsageWithWeight(conf.getLoadBalancerCPUResourceWeight(),
+                (1 - historyPercentage) * localBrokerData.getMaxResourceUsageWithWeight(conf.getLoadBalancerCPUResourceWeight(),     //取5个指标的最大值
                         conf.getLoadBalancerMemoryResourceWeight(), conf.getLoadBalancerDirectMemoryResourceWeight(),
                         conf.getLoadBalancerBandwithInResourceWeight(), conf.getLoadBalancerBandwithOutResourceWeight());
         brokerAvgResourceUsage.put(broker, historyUsage);
