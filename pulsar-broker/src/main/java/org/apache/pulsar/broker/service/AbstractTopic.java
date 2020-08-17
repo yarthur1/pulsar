@@ -380,7 +380,7 @@ public abstract class AbstractTopic implements Topic {
         }
     }
 
-    private boolean isUserProvidedProducerName(Producer producer){
+    private boolean isUserProvidedProducerName(Producer producer){     //不能是replication producer
         //considered replicator producer as generated name producer
         return producer.isUserProvidedProducerName() && !producer.getProducerName().startsWith(replicatorPrefix);
     }
