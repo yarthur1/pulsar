@@ -135,7 +135,7 @@ public class PersistentTopic extends AbstractTopic implements Topic, AddEntryCal
     // Subscriptions to this topic
     private final ConcurrentOpenHashMap<String, PersistentSubscription> subscriptions;
 
-    private final ConcurrentOpenHashMap<String, Replicator> replicators;
+    private final ConcurrentOpenHashMap<String, Replicator> replicators;        //存储replication producer
 
     protected static final AtomicLongFieldUpdater<PersistentTopic> USAGE_COUNT_UPDATER =
             AtomicLongFieldUpdater.newUpdater(PersistentTopic.class, "usageCount");
@@ -324,7 +324,7 @@ public class PersistentTopic extends AbstractTopic implements Topic, AddEntryCal
         MessageDeduplication.MessageDupStatus status = messageDeduplication.isDuplicate(publishContext, headersAndPayload);
         switch (status) {
             case NotDup:
-                ledger.asyncAddEntry(headersAndPayload, this, publishContext);
+                ledger.asyncAddEntry(headersAndPayload, this, publishContext);   //
                 break;
             case Dup:
                 // Immediately acknowledge duplicated message
@@ -409,7 +409,7 @@ public class PersistentTopic extends AbstractTopic implements Topic, AddEntryCal
     }
 
     @Override
-    public void addProducer(Producer producer) throws BrokerServiceException {
+    public void addProducer(Producer producer) throws BrokerServiceException {      //添加producer流程
         checkArgument(producer.getTopic() == this);
 
         lock.readLock().lock();
@@ -459,7 +459,7 @@ public class PersistentTopic extends AbstractTopic implements Topic, AddEntryCal
                 Set<String> configuredClusters = Sets.newTreeSet(policies.replication_clusters);
                 replicators.forEach((region, replicator) -> {
                     if (configuredClusters.contains(region)) {
-                        replicator.startProducer();
+                        replicator.startProducer();  //
                     }
                 });
             }

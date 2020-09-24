@@ -99,7 +99,7 @@ public abstract class AbstractReplicator {
 
     // This method needs to be synchronized with disconnects else if there is a disconnect followed by startProducer
     // the end result can be disconnect.
-    public synchronized void startProducer() {
+    public synchronized void startProducer() {             //启动replication producer
         if (STATE_UPDATER.get(this) == State.Stopping) {
             long waitTimeMs = backOff.next();
             if (log.isDebugEnabled()) {
@@ -141,7 +141,7 @@ public abstract class AbstractReplicator {
     private void retryCreateProducer(Throwable ex) {
         if (STATE_UPDATER.compareAndSet(this, State.Starting, State.Stopped)) {
             long waitTimeMs = backOff.next();
-            log.warn("[{}][{} -> {}] Failed to create remote producer ({}), retrying in {} s", topicName,
+            log.warn("[{}][{} -> {}] Failed to create remote producer ({}), retrying in {} s", topicName,  //
                 localCluster, remoteCluster, ex.getMessage(), waitTimeMs / 1000.0);
 
             // BackOff before retrying
